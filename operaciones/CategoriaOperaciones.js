@@ -10,7 +10,8 @@ CategoriaOperaciones.crearCategoria = async(req, res) => {
             res.status(201).send(categoriaGuardada);
         }
     } catch (error) {
-        res.status(400).send("Mala petición. "+error);
+        console.log(error);
+        res.status(400).json(error);
     }
 }
 
@@ -18,15 +19,16 @@ CategoriaOperaciones.consultarCategorias = async(req, res) => {
     try {
         const filtro = req.query;
         let listacategorias;
-        if (filtro.nombre != null) {
+        if (filtro.q != null) {
             listacategorias = await CategoriaModelo.find({
                 "$or" : [ 
-                    {"nombre": { $regex:filtro.nombre, $options:"i" }}
+                    {"nombre": { $regex:filtro.q, $options:"i" }},
+                    {"imagen": { $regex:filtro.q, $options:"i" }},
                 ]
             });
         }
         else {
-            listacategorias = await CategoriaModelo.find();
+            listacategorias = await CategoriaModelo.find(filtro);
         }
         if (listacategorias.length > 0) {
             res.status(200).send(listacategorias);
@@ -35,7 +37,7 @@ CategoriaOperaciones.consultarCategorias = async(req, res) => {
             res.status(404).send("No hay datos");
         }
     } catch (error) {
-        res.status(400).send("Mala petición. "+error);
+        res.status(400).json(error);
     }
 }
 
@@ -50,7 +52,7 @@ CategoriaOperaciones.consultarCategoria = async(req, res) => {
             res.status(404).send("No hay datos");
         }
     } catch (error) {
-        res.status(400).send("Mala petición. "+error);
+        res.status(400).json(error);
     }
 }
 
@@ -65,9 +67,14 @@ CategoriaOperaciones.modificarCategoria = async(req, res) => {
         }
         console.log(categoria);
         const categoriaActualizada = await CategoriaModelo.findByIdAndUpdate(id, categoria, { new: true });
-        res.status(200).send(categoriaActualizada);
+        if(categoriaActualizada != null) {
+            res.status(200).send(categoriaActualizada);
+        }
+        else {
+            res.status(404).send("No hay datos");
+        }
     } catch (error) {
-        res.status(400).send("Mala petición. "+error);
+        res.status(400).json(error);
     }
 }
 
@@ -75,9 +82,14 @@ CategoriaOperaciones.borrarCategoria = async(req, res) => {
     try {
         const id = req.params.id;
         const categoriaBorrada = await CategoriaModelo.findByIdAndDelete(id);
-        res.status(200).send(categoriaBorrada);
+        if (categoriaBorrada != null) {
+            res.status(200).send(categoriaBorrada);
+        }
+        else {
+            res.status(404).send("No hay datos");
+        }
     } catch (error) {
-        res.status(400).send("Mala petición. "+error);
+        res.status(400).json(error);
     }
 }
 

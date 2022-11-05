@@ -21,4 +21,5 @@ app.listen(port, ()=>{
 app.get("/", (req, res)=>{
     res.send("API iniciado");
 })
-app.use("/categorias", require("./rutas/CategoriaRutas"));
+app.use("/api/categorias", require("./rutas/CategoriaRutas"));
+app.use("/api/productos", require("./rutas/ProductoRutas"));
